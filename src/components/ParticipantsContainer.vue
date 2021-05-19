@@ -1,20 +1,20 @@
 <template>
   <div ref="scrollComponent">
-    <Participants :participants="participants" />
+    <ParticipantsList :participants="participants" />
     <UsersLoaded v-if="participantsLoaded" />
   </div>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
-import Participants from "./Participants";
+import ParticipantsList from "./ParticipantsList";
 import UsersLoaded from "./UsersLoaded";
 import { throttle } from "lodash";
 
 export default {
   name: 'ParticipantsContainer',
   components: {
-    Participants,
+    ParticipantsList,
     UsersLoaded
   },
   setup () {

@@ -1,14 +1,14 @@
 <template>
-  <Draw />
+  <TheDraw />
 </template>
 
 <script>
-import Draw from './components/Draw';
+import TheDraw from './components/TheDraw';
 
 export default {
   name: 'App',
   components: {
-    Draw,
+    TheDraw,
   }
 }
 </script>

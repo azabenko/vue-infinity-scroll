@@ -15,7 +15,7 @@ import ParticipantsContainer from "./ParticipantsContainer";
 import LeftUntilDraw from "./LeftUntilDraw";
 
 export default {
-  name: 'Draw',
+  name: 'TheDraw',
   components: {
     ParticipantsContainer,
     LeftUntilDraw

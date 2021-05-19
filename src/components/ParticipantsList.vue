@@ -21,22 +21,11 @@
 
 <script>
 export default {
-  name: "Participants",
+  name: "ParticipantsList",
   props: {
     participants: Array
   },
   methods: {
-    _isToday(date) {
-      return date.toDateString() === (new Date()).toDateString();
-    },
-
-    _isYesterday(date) {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      return date.toDateString() === yesterday.toDateString();
-    },
-
     transformDate(date) {
       const ONE_MINUTE = 60 * 1000;
       const ONE_HOUR = 60 * ONE_MINUTE;
@@ -44,6 +33,12 @@ export default {
       const currDate = new Date();
       const timeLeft = currDate - new Date(date);
       const month = date.toLocaleDateString('en-US', { month: 'short'});
+      const isToday = date.toDateString() === (new Date()).toDateString();
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const isYesterday = date.toDateString() === yesterday.toDateString();
+
 
       if ( timeLeft < ONE_MINUTE ) {
         return 'just now';
@@ -53,11 +48,11 @@ export default {
         return `${Math.floor(timeLeft / ONE_MINUTE)}m ago`;
       }
 
-      if ( this._isToday(date) ) {
+      if ( isToday ) {
         return `${Math.floor(timeLeft / ONE_HOUR)}h ago`;
       }
 
-      if ( this._isYesterday(date) ) {
+      if ( isYesterday ) {
         return 'yesterday';
       }
 
