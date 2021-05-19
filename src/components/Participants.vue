@@ -13,7 +13,7 @@
         <td><img class="participant__avatar" width="48" height="48" :alt="participant.name" :src="participant.avatar"/></td>
         <td>{{ participant.name }}</td>
         <td>{{ participant.email }}</td>
-        <td>{{ participant.signedUp }}</td>
+        <td>{{ transformDate(participant.signedUp) }}</td>
       </tr>
     </tbody>
   </table>
@@ -24,6 +24,49 @@ export default {
   name: "Participants",
   props: {
     participants: Array
+  },
+  methods: {
+    _isToday(date) {
+      return date.toDateString() === (new Date()).toDateString();
+    },
+
+    _isYesterday(date) {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      return date.toDateString() === yesterday.toDateString();
+    },
+
+    transformDate(date) {
+      const ONE_MINUTE = 60 * 1000;
+      const ONE_HOUR = 60 * ONE_MINUTE;
+
+      const currDate = new Date();
+      const timeLeft = currDate - new Date(date);
+      const month = date.toLocaleDateString('en-US', { month: 'short'});
+
+      if ( timeLeft < ONE_MINUTE ) {
+        return 'just now';
+      }
+
+      if ( timeLeft < ONE_HOUR ) {
+        return `${Math.floor(timeLeft / ONE_MINUTE)}m ago`;
+      }
+
+      if ( this._isToday(date) ) {
+        return `${Math.floor(timeLeft / ONE_HOUR)}h ago`;
+      }
+
+      if ( this._isYesterday(date) ) {
+        return 'yesterday';
+      }
+
+      if ( date.getFullYear() === currDate.getFullYear() ) {
+        return `${date.getDate()} ${month}`
+      }
+
+      return `${date.getDate()} ${month} ${date.getFullYear()}`
+    }
   }
 }
 </script>

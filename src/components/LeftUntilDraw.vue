@@ -8,15 +8,13 @@
 <script>
 export default {
   name: "LeftUntilDraw",
-  setup () {
-    const currDay = new Date();
-    const endOfDay = new Date();
-    endOfDay.setHours(23,59,59,999);
+  computed: {
+    timeLeft() {
+      const currDay = new Date();
+      const endOfDay = new Date();
+      endOfDay.setHours(23,59,59,999);
 
-    const timeLeft = `${endOfDay.getHours() - currDay.getHours()}H ${endOfDay.getMinutes() - currDay.getMinutes()}M ${endOfDay.getSeconds() - currDay.getSeconds()}S`;
-
-    return {
-      timeLeft
+      return `${endOfDay.getHours() - currDay.getHours()}H ${endOfDay.getMinutes() - currDay.getMinutes()}M ${endOfDay.getSeconds() - currDay.getSeconds()}S`;
     }
   }
 }

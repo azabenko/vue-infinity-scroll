@@ -18,54 +18,12 @@ export default {
     UsersLoaded
   },
   setup () {
+    const MAX_PARTICIPANTS_COUNT = 50;
+    const RESULTS_COUNT = 20;
+
     const scrollComponent = ref(null)
     const participants = ref([])
     const participantsLoaded = ref(false)
-
-    const isToday = (date) => {
-      return date.toDateString() === (new Date()).toDateString();
-    }
-
-    const isYesterday = (date) => {
-      const yesterday = new Date();
-      yesterday.setDate(date.getDate() - 1);
-
-      return date.toDateString() === yesterday.toDateString();
-    }
-
-    const transformDate = (date) => {
-      const ONE_MINUTE = 60 * 1000;
-      const ONE_HOUR = 60 * ONE_MINUTE;
-
-      const currDate = new Date();
-      const timeLeft = currDate - new Date(date);
-
-      if ( timeLeft < ONE_MINUTE ) {
-        return 'just now';
-      }
-
-      if ( timeLeft < ONE_HOUR ) {
-        return date.getMinutes();
-      }
-
-      if ( isToday(date) ) {
-        return date.getHours();
-      }
-
-      if ( isYesterday(date) ) {
-        return 'yesterday';
-      }
-
-      if ( date.getFullYear() === currDate.getFullYear() ) {
-        return date
-            .toLocaleDateString('en-US', { day: 'numeric', month: 'short'})
-            .split(' ')
-            .reverse()
-            .join(' ');
-      }
-
-      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-    }
 
     const transformParticipant = ({name, email, registered, id, picture}) => {
       return {
@@ -73,40 +31,48 @@ export default {
         avatar: picture.thumbnail,
         name: `${name.first} ${name.last}`,
         email,
-        signedUp: transformDate(new Date(registered.date))
+        signedUp: new Date(registered.date)
       }
     }
 
-    const fetchParticipants = () => {
-      fetch("https://randomuser.me/api/?inc=name,email,picture,registered,id&results=20&noinfo")
+    const sortParticipants = (a, b) => {
+      return new Date(b.signedUp) - new Date(a.signedUp);
+    }
+
+    const fetchParticipants = (results = RESULTS_COUNT) => {
+      fetch(`https://randomuser.me/api/?inc=name,email,picture,registered,id&results=${results}&noinfo`)
           .then(response => response.json())
           .then(({ results }) => results.map(participant => transformParticipant(participant)))
           .then((data) => participants.value.push(...data))
+          .then(() => participants.value.sort(sortParticipants))
     }
-
-    fetchParticipants();
 
     const handleScroll = () => {
       const element = scrollComponent.value
 
-      if ( element.getBoundingClientRect().bottom < window.innerHeight && participants.value.length < 50 ) {
-        fetchParticipants();
+      if ( element.getBoundingClientRect().bottom < window.innerHeight && participants.value.length < MAX_PARTICIPANTS_COUNT ) {
+        const resultsLeft = MAX_PARTICIPANTS_COUNT - participants.value.length;
+        const results = resultsLeft > RESULTS_COUNT ? RESULTS_COUNT : resultsLeft;
+
+        fetchParticipants(results);
       }
 
-      if ( participants.value.length >= 50 ) {
+      if ( participants.value.length >= MAX_PARTICIPANTS_COUNT ) {
         participantsLoaded.value = true;
       }
     }
 
-    const foo = throttle(handleScroll, 200);
+    const throttledScrollHandler = throttle(handleScroll, 200);
 
     onMounted(() => {
-      window.addEventListener("scroll", foo)
+      window.addEventListener("scroll", throttledScrollHandler)
     })
 
     onUnmounted(() => {
-      window.removeEventListener("scroll", foo)
+      window.removeEventListener("scroll", throttledScrollHandler)
     })
+
+    fetchParticipants();
 
     return {
       participants,
